@@ -1,0 +1,39 @@
+{
+  "name": "patternplate-transform-typescript",
+  "version": "0.1.0",
+  "description": "TypeScript transform for patternplate",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "tsc --project .",
+    "linter": "tslint --project ./tsconfig.json",
+    "prerelease": "npm start",
+    "release": "standard-version",
+    "postrelease": "git push --follow-tags origin master && npm publish"
+  },
+  "author": {
+    "name": "Markus Wolf",
+    "email": "knister.peter@shadowrun-clan.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "KnisterPeter/patternplate-transform-typescript"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@knisterpeter/standard-tslint": "^1.4.0",
+    "@types/node": "^7.0.12",
+    "cz-conventional-changelog": "2.0.0",
+    "tslint": "^5.0.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=2.2.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
