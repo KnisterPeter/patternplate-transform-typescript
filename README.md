@@ -2,6 +2,8 @@
 
 # patternplate-transform-typescript
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/KnisterPeter/patternplate-transform-typescript.svg)](https://greenkeeper.io/)
+
 ## Installation
 
 ```shell
