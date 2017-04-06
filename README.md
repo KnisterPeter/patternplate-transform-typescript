@@ -49,6 +49,8 @@ module.exports = {
 
 ```
 
+Note: Currently there are a [few transpiler/compiler defaults](https://github.com/KnisterPeter/patternplate-transform-typescript/blob/master/src/transpiler.ts#L22-L90) which are not overridable
+
 ---
 Built by (c) Markus Wolf. Released under the [MIT license]('./LICENSE').
 
