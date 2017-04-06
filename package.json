@@ -10,6 +10,7 @@
     "start": "tsc --project .",
     "linter": "tslint --project ./tsconfig.json",
     "test": "nyc ava",
+    "coverage": "nyc report --reporter=lcov && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "prerelease": "npm start",
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin master && npm publish"
@@ -29,6 +30,7 @@
     "@types/node": "^7.0.12",
     "ava": "^0.19.0",
     "common-tags": "^1.4.0",
+    "coveralls": "^2.13.0",
     "cz-conventional-changelog": "2.0.0",
     "nyc": "^10.2.0",
     "source-map-support": "^0.4.14",
