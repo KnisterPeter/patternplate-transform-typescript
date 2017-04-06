@@ -14,7 +14,8 @@ function writeDeclaration(input: PatterplateFile, output: TranspileOutput, appli
       pattern: input.pattern.id,
       type: 'd.ts',
       reference: true,
-      content: output.declarationText
+      content: output.declarationText,
+      file: input
     });
   }
 }

@@ -38,4 +38,5 @@ export interface OutputArtifact {
   type: string;
   reference: boolean;
   content: string;
+  file: PatterplateFile;
 }

@@ -12,7 +12,8 @@ test('addOutputArtifact should add the given artifact if supported by the applic
     content: 'content',
     pattern: 'pattern',
     reference: true,
-    type: 'd.ts'
+    type: 'd.ts',
+    file: {} as any
   };
 
   utils.addOutputArtifact(application, artifact);
@@ -27,7 +28,8 @@ test('addOutputArtifact should not add the given artifact if not supported by th
     content: 'content',
     pattern: 'pattern',
     reference: true,
-    type: 'd.ts'
+    type: 'd.ts',
+    file: {} as any
   };
 
   utils.addOutputArtifact(application, artifact);
@@ -41,7 +43,8 @@ test('addOutputArtifact should replace an existing artifact', t => {
     content: 'content',
     pattern: 'pattern',
     reference: true,
-    type: 'd.ts'
+    type: 'd.ts',
+    file: {} as any
   };
   const artifact1 = Object.assign({}, artifact0, {content: 'new-content'});
   const application: Application = {
