@@ -65,7 +65,8 @@
     "exclude": [
       "node_modules",
       "coverage",
-      "dist/**/*.test.js"
+      "dist/**/*.test.js",
+      "wallaby.conf.js"
     ]
   }
 }

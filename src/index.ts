@@ -1,15 +1,15 @@
 import * as ts from 'typescript';
 import { transpileModule, TranspileOutput } from './transpiler';
 import { Application, PatternplateConfiguration, PatterplateFile, TypeScriptTransform } from './types';
+import * as utils from './utils';
 
 module.exports = function createTypescriptTransform(application: Application): TypeScriptTransform {
   return typescriptTransformFactory(application);
 };
 
 function writeDeclaration(input: PatterplateFile, output: TranspileOutput, application: Application): void {
-  if (application.resources && output.declarationText) {
-    application.resources = application.resources.filter(r => r.id !== `typescript-definition/${input.pattern.id}`);
-    application.resources.push({
+  if (output.declarationText) {
+    utils.addOutputArtifact(application, {
       id: `typescript-definition/${input.pattern.id}`,
       pattern: input.pattern.id,
       type: 'd.ts',

@@ -24,10 +24,18 @@ export interface PatternplateConfiguration {
 }
 
 export interface Application {
-  resources?: any;
+  resources?: OutputArtifact[];
 }
 
 export interface TypeScriptTransform {
   (file: PatterplateFile, unused: any, configuration: PatternplateConfiguration):
     Promise<PatterplateFile>;
+}
+
+export interface OutputArtifact {
+  id: string;
+  pattern: string;
+  type: string;
+  reference: boolean;
+  content: string;
 }
