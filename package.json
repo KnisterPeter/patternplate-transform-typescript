@@ -9,6 +9,8 @@
   "scripts": {
     "start": "tsc --project .",
     "linter": "tslint --project ./tsconfig.json",
+    "clean": "rimraf dist",
+    "pretest": "npm run clean && npm start",
     "test": "nyc ava",
     "coverage": "nyc report --reporter=lcov && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "prerelease": "npm start",
@@ -33,6 +35,7 @@
     "coveralls": "^2.13.0",
     "cz-conventional-changelog": "2.0.0",
     "nyc": "^10.2.0",
+    "rimraf": "^2.6.1",
     "source-map-support": "^0.4.14",
     "standard-version": "^4.0.0",
     "tslint": "^5.0.0"
