@@ -104,7 +104,7 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
       try {
         return ts.createSourceFile(fileName, ts.sys.readFile(fileName), options.target || ts.ScriptTarget.ES5);
       } catch (e) {
-        console.log('failed to read source-file', fileName);
+        console.error('failed to read source-file', fileName);
         return undefined!;
       }
     },

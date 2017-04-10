@@ -8,17 +8,17 @@ function getApplicationMock(): Application {
   return {};
 }
 
-function getFileMock(buffer: Buffer | string): PatterplateFile {
+function getFileMock(buffer: Buffer | string, id = 'id'): PatterplateFile {
   return {
     buffer,
-    name: 'name',
-    basename: 'basename',
-    ext: 'ext',
+    name: 'name.tsx',
+    basename: 'name',
+    ext: 'tsx',
     format: 'tsx',
     fs: undefined,
     path: 'path',
     pattern: {
-      id: 'id',
+      id,
       base: 'base',
       path: 'path'
     },
@@ -51,8 +51,6 @@ test('createTypescriptTransform should transpile simple ts module', async t => {
     `);
 
   t.is(result.buffer.toString().trim(), stripIndents`
-        "use strict";
-        exports.__esModule = true;
         function double(n) { return n * 2; }
     `);
 });
@@ -61,29 +59,23 @@ test('createTypescriptTransform should transpile module with dependencies', asyn
   const application = getApplicationMock();
   const file = getFileMock(`
         function double0(n: number) { return n * 2; }
-    `);
+    `, 'id0');
   file.dependencies['dep'] = getFileMock(`
         function double1(n: number) { return n * 2; }
-    `);
+    `, 'id1');
   file.dependencies['dep'].dependencies['dep2'] = getFileMock(`
         function double2(n: number) { return n * 2; }
-    `);
+    `, 'id2');
 
   const result = await transpile(application, file);
 
   t.is(result.buffer.toString().trim(), stripIndents`
-        "use strict";
-        exports.__esModule = true;
         function double0(n) { return n * 2; }
     `);
   t.is(result.dependencies['dep'].buffer.toString().trim(), stripIndents`
-        "use strict";
-        exports.__esModule = true;
         function double1(n) { return n * 2; }
     `);
   t.is(result.dependencies['dep'].dependencies['dep2'].buffer.toString().trim(), stripIndents`
-        "use strict";
-        exports.__esModule = true;
         function double2(n) { return n * 2; }
     `);
 });
