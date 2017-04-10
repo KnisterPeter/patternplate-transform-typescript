@@ -9,6 +9,7 @@ export interface TranspileOptions {
 }
 
 export interface TranspileOutput {
+  status: number;
   outputText: string;
   declarationText?: string;
   diagnostics?: ts.Diagnostic[];
@@ -17,33 +18,7 @@ export interface TranspileOutput {
 
 // tslint:disable cyclomatic-complexity
 export function transpileModule(input: string, transpileOptions: TranspileOptions): TranspileOutput {
-  const diagnostics: ts.Diagnostic[] = [];
-
   const options: ts.CompilerOptions = transpileOptions.compilerOptions || ts.getDefaultCompilerOptions();
-
-  options.isolatedModules = true;
-
-  // transpileModule does not write anything to disk so there is no need to verify that there are no conflicts
-  // between input and output paths.
-  options.suppressOutputPathCheck = true;
-
-  // filename can be non-ts file.
-  options.allowNonTsExtensions = true;
-
-  // we are not returning a sourceFile for lib file when asked by the program,
-  // so pass --noLib to avoid reporting a file not found error.
-  options.noLib = true;
-
-  // clear out other settings that would not be used in transpiling this module
-  options.lib = undefined;
-  options.types = undefined;
-  options.noEmit = undefined;
-  options.noEmitOnError = undefined;
-  options.paths = undefined;
-  options.rootDirs = undefined;
-  options.declarationDir = undefined;
-  options.out = undefined;
-  options.outFile = undefined;
 
   if (options.jsx && typeof options.jsx === 'string') {
     switch ((options.jsx as string).toLowerCase()) {
@@ -85,9 +60,28 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
     }
   }
 
-  // we are not doing a full typecheck, we are not resolving the whole context,
-  // so pass --noResolve to avoid reporting missing file errors.
-  options.noResolve = true;
+  if (options.module && typeof options.module === 'string') {
+    switch ((options.module as string).toLowerCase()) {
+      case 'amd':
+        options.module = ts.ModuleKind.AMD;
+        break;
+      case 'commonjs':
+        options.module = ts.ModuleKind.CommonJS;
+        break;
+      case 'es2015':
+        options.module = ts.ModuleKind.ES2015;
+        break;
+      case 'none':
+        options.module = ts.ModuleKind.None;
+        break;
+      case 'system':
+        options.module = ts.ModuleKind.System;
+        break;
+      case 'umd':
+        options.module = ts.ModuleKind.UMD;
+        break;
+    }
+  }
 
   // if jsx is specified then treat file as .tsx
   const inputFileName = transpileOptions.fileName || (options.jsx ? 'module.tsx' : 'module.ts');
@@ -103,7 +97,17 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
 
   // create a compilerHost object to allow the compiler to read and write files
   const compilerHost: ts.CompilerHost = {
-    getSourceFile: (fileName) => fileName === inputFileName ? sourceFile : undefined!,
+    getSourceFile: (fileName) => {
+      if (fileName === inputFileName) {
+        return sourceFile;
+      }
+      try {
+        return ts.createSourceFile(fileName, ts.sys.readFile(fileName), options.target || ts.ScriptTarget.ES5);
+      } catch (e) {
+        console.log('failed to read source-file', fileName);
+        return undefined!;
+      }
+    },
     writeFile: (name, text) => {
       if (name.endsWith('.map')) {
         sourceMapText = text;
@@ -113,25 +117,37 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
         outputText = text;
       }
     },
-    getDefaultLibFileName: () => 'lib.d.ts',
-    useCaseSensitiveFileNames: () => false,
-    getCanonicalFileName: fileName => fileName,
-    getCurrentDirectory: () => '',
-    getNewLine: () => '\n',
-    fileExists: (fileName): boolean => fileName === inputFileName,
-    readFile: () => '',
-    directoryExists: () => true,
+    getDefaultLibFileName: () => ts.getDefaultLibFilePath(options),
+    useCaseSensitiveFileNames: () => ts.sys.useCaseSensitiveFileNames,
+    getCanonicalFileName: fileName => ts.sys.useCaseSensitiveFileNames ? fileName : fileName.toLowerCase(),
+    getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
+    getNewLine: () => ts.sys.newLine,
+    fileExists: (fileName): boolean => ts.sys.fileExists(fileName),
+    readFile: path => ts.sys.readFile(path),
+    directoryExists: path => ts.sys.directoryExists(path),
     getDirectories: () => []
   };
 
   const program = ts.createProgram([inputFileName], options, compilerHost);
 
-  program.emit();
+  const result = program.emit();
+  const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(result.diagnostics);
+  allDiagnostics.forEach(diagnostic => {
+    const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+    if (diagnostic.file) {
+      const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+      console.error(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
+    } else {
+      console.error(`${message}`);
+    }
+  });
+  const exitCode = result.emitSkipped ? 1 : 0;
 
   return {
+    status: exitCode,
     outputText,
     declarationText,
-    diagnostics,
+    diagnostics: allDiagnostics,
     sourceMapText
   };
 }

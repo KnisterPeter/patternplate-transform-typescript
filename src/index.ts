@@ -37,7 +37,9 @@ function transpileFile(file: PatterplateFile, compilerOptions: ts.CompilerOption
   application: Application): void {
   Object.keys(file.dependencies).forEach(localName => {
     const dependency = file.dependencies[localName];
-    transpileFile(dependency, compilerOptions, application);
+    if (file.pattern.id !== dependency.pattern.id) {
+      transpileFile(dependency, compilerOptions, application);
+    }
   });
   transpile(file, compilerOptions, application);
 }
