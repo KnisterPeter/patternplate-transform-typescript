@@ -1,6 +1,6 @@
 {
   "name": "patternplate-transform-typescript",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "TypeScript transform for patternplate",
   "main": "dist/index.js",
   "files": [
