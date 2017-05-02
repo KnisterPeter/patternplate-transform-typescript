@@ -1,6 +1,6 @@
+import * as path from 'path';
 import * as ts from 'typescript';
 import { PatternManifest } from './types';
-import * as path from 'path';
 
 export interface TranspileOptions {
   compilerOptions?: ts.CompilerOptions;
