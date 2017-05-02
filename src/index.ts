@@ -28,7 +28,7 @@ function transpile(input: PatterplateFile, compilerOptions: ts.CompilerOptions, 
     moduleName: input.basename
   };
   const content = typeof input.buffer === 'string' ? input.buffer : input.buffer.toString('utf-8');
-  const output = transpileModule(content, transpileOptions);
+  const output = transpileModule(content, transpileOptions, input.pattern.manifest, input.pattern.base);
   input.buffer = new Buffer(output.outputText);
   writeDeclaration(input, output, application);
 }

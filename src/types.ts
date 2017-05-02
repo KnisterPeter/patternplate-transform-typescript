@@ -12,11 +12,18 @@ export interface PatterplateFile {
     id: string;
     base: string;
     path: string;
+    manifest: PatternManifest;
   };
   meta: any;
   dependencies: { [name: string]: PatterplateFile };
   in: string;
   out: string;
+}
+
+export interface PatternManifest {
+  patterns?: {
+    [local: string]: string;
+  };
 }
 
 export interface PatternplateConfiguration {

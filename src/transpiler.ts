@@ -1,4 +1,6 @@
 import * as ts from 'typescript';
+import { PatternManifest } from './types';
+import * as path from 'path';
 
 export interface TranspileOptions {
   compilerOptions?: ts.CompilerOptions;
@@ -17,7 +19,8 @@ export interface TranspileOutput {
 }
 
 // tslint:disable cyclomatic-complexity
-export function transpileModule(input: string, transpileOptions: TranspileOptions): TranspileOutput {
+export function transpileModule(input: string, transpileOptions: TranspileOptions,
+    patternManifest: PatternManifest, patternRoot: string): TranspileOutput {
   const options: ts.CompilerOptions = transpileOptions.compilerOptions || ts.getDefaultCompilerOptions();
 
   if (options.jsx && typeof options.jsx === 'string') {
@@ -131,6 +134,11 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
         // try patternplate demo Pattern dependency
         if (moduleName === 'Pattern' && containingFile.endsWith('demo.tsx')) {
           return { resolvedFileName: containingFile.replace('demo.tsx', 'index.tsx') };
+        }
+
+        if (patternManifest.patterns && moduleName in patternManifest.patterns) {
+          const resolvedFileName = path.join(patternRoot, patternManifest.patterns[moduleName], 'index.tsx');
+          return { resolvedFileName };
         }
 
         // try to use standard resolution

@@ -20,7 +20,9 @@ function getFileMock(buffer: Buffer | string, id = 'id'): PatterplateFile {
     pattern: {
       id,
       base: 'base',
-      path: 'path'
+      path: 'path',
+      manifest: {
+      }
     },
     meta: undefined,
     dependencies: {},
