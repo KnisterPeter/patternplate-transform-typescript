@@ -125,7 +125,25 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
     fileExists: (fileName): boolean => ts.sys.fileExists(fileName),
     readFile: path => ts.sys.readFile(path),
     directoryExists: path => ts.sys.directoryExists(path),
-    getDirectories: () => []
+    getDirectories: () => [],
+    resolveModuleNames(moduleNames: string[], containingFile: string): (ts.ResolvedModule)[] {
+      return moduleNames.map(moduleName => {
+        // try patternplate demo Pattern dependency
+        if (moduleName === 'Pattern' && containingFile.endsWith('demo.tsx')) {
+          return { resolvedFileName: containingFile.replace('demo.tsx', 'index.tsx') };
+        }
+
+        // try to use standard resolution
+        const result = ts.resolveModuleName(moduleName, containingFile, options,
+          { fileExists: ts.sys.fileExists, readFile: ts.sys.readFile });
+        if (result.resolvedModule) {
+          return result.resolvedModule;
+        }
+
+        // note: as any is a quirk here, since the CompilerHost interface does not allow strict null checks
+        return undefined as any;
+      });
+    }
   };
 
   const program = ts.createProgram([inputFileName], options, compilerHost);

@@ -23,7 +23,7 @@ function writeDeclaration(input: PatterplateFile, output: TranspileOutput, appli
 function transpile(input: PatterplateFile, compilerOptions: ts.CompilerOptions, application: Application): void {
   const transpileOptions: ts.TranspileOptions = {
     compilerOptions,
-    fileName: input.name,
+    fileName: input.path,
     reportDiagnostics: true,
     moduleName: input.basename
   };
@@ -37,7 +37,7 @@ function transpileFile(file: PatterplateFile, compilerOptions: ts.CompilerOption
   application: Application): void {
   Object.keys(file.dependencies).forEach(localName => {
     const dependency = file.dependencies[localName];
-    if (file.pattern.id !== dependency.pattern.id) {
+    if (file.pattern.id !== dependency.pattern.id || file.path !== dependency.path) {
       transpileFile(dependency, compilerOptions, application);
     }
   });
@@ -47,6 +47,7 @@ function transpileFile(file: PatterplateFile, compilerOptions: ts.CompilerOption
 function typescriptTransformFactory(application: Application): TypeScriptTransform {
   return async function typescriptTransform(file: PatterplateFile, _, configuration: PatternplateConfiguration):
     Promise<PatterplateFile> {
+
     const compilerOptions = configuration.opts || ts.getDefaultCompilerOptions();
     transpileFile(file, compilerOptions, application);
     return file;

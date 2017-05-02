@@ -11,12 +11,12 @@ function getApplicationMock(): Application {
 function getFileMock(buffer: Buffer | string, id = 'id'): PatterplateFile {
   return {
     buffer,
-    name: 'name.tsx',
-    basename: 'name',
+    name: 'module.tsx',
+    basename: 'module',
     ext: 'tsx',
     format: 'tsx',
     fs: undefined,
-    path: 'path',
+    path: 'path/module.tsx',
     pattern: {
       id,
       base: 'base',
