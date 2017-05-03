@@ -16,7 +16,6 @@ export function mapJsx(input: string | ts.JsxEmit): ts.JsxEmit {
 
 export function mapTarget(input: string | ts.ScriptTarget): ts.ScriptTarget {
   if (typeof input === 'string') {
-    console.log(getKeys(ts.ScriptTarget));
     const result = getKeys(ts.ScriptTarget)[input.toLowerCase()];
     if (result === undefined) {
       throw new Error(`Invalid input '${input}'`);
