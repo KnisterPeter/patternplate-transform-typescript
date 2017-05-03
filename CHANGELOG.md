@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.4.2"></a>
+## [0.4.2](https://github.com/KnisterPeter/patternplate-transform-typescript/compare/v0.4.1...v0.4.2) (2017-05-03)
+
+
+### Bug Fixes
+
+* lowercase mapping of options ([f9dcac1](https://github.com/KnisterPeter/patternplate-transform-typescript/commit/f9dcac1))
+* remove debug output ([24cb4ae](https://github.com/KnisterPeter/patternplate-transform-typescript/commit/24cb4ae))
+
+
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://github.com/KnisterPeter/patternplate-transform-typescript/compare/v0.4.0...v0.4.1) (2017-05-03)
 
