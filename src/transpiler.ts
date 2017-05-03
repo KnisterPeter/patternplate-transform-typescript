@@ -31,7 +31,7 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
     options.target = mapTarget(options.target);
   }
 
-  if (options.module && typeof options.module === 'string') {
+  if (options.module) {
     options.module = mapModule(options.module);
   }
 
@@ -108,7 +108,14 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
   const result = program.emit();
   const allDiagnostics =
     ts.getPreEmitDiagnostics(program)
-    .concat(result.diagnostics, program.getDeclarationDiagnostics());
+    .concat(
+      result.diagnostics,
+      program.getDeclarationDiagnostics(),
+      program.getGlobalDiagnostics(),
+      program.getOptionsDiagnostics(),
+      program.getSemanticDiagnostics(),
+      program.getSyntacticDiagnostics()
+    );
   allDiagnostics.forEach(diagnostic => {
     const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
     if (diagnostic.file) {
