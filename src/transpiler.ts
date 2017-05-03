@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as ts from 'typescript';
+import { mapJsx, mapTarget, mapModule } from './options';
 import { PatternManifest } from './types';
 
 export interface TranspileOptions {
@@ -23,67 +24,15 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
     patternManifest: PatternManifest, patternRoot: string): TranspileOutput {
   const options: ts.CompilerOptions = transpileOptions.compilerOptions || ts.getDefaultCompilerOptions();
 
-  if (options.jsx && typeof options.jsx === 'string') {
-    switch ((options.jsx as string).toLowerCase()) {
-      case 'none':
-        options.jsx = ts.JsxEmit.None;
-        break;
-      case 'preserve':
-        options.jsx = ts.JsxEmit.Preserve;
-        break;
-      case 'react':
-        options.jsx = ts.JsxEmit.React;
-        break;
-      case 'react-native':
-        options.jsx = ts.JsxEmit.ReactNative;
-        break;
-    }
+  if (options.jsx) {
+    options.jsx = mapJsx(options.jsx);
   }
-
-  if (options.target && typeof options.target === 'string') {
-    switch ((options.target as string).toLowerCase()) {
-      case 'es3':
-        options.target = ts.ScriptTarget.ES3;
-        break;
-      case 'es5':
-        options.target = ts.ScriptTarget.ES5;
-        break;
-      case 'es2015':
-        options.target = ts.ScriptTarget.ES2015;
-        break;
-      case 'es2016':
-        options.target = ts.ScriptTarget.ES2016;
-        break;
-      case 'es2017':
-        options.target = ts.ScriptTarget.ES2017;
-        break;
-      case 'esnext':
-        options.target = ts.ScriptTarget.ESNext;
-        break;
-    }
+  if (options.target) {
+    options.target = mapTarget(options.target);
   }
 
   if (options.module && typeof options.module === 'string') {
-    switch ((options.module as string).toLowerCase()) {
-      case 'amd':
-        options.module = ts.ModuleKind.AMD;
-        break;
-      case 'commonjs':
-        options.module = ts.ModuleKind.CommonJS;
-        break;
-      case 'es2015':
-        options.module = ts.ModuleKind.ES2015;
-        break;
-      case 'none':
-        options.module = ts.ModuleKind.None;
-        break;
-      case 'system':
-        options.module = ts.ModuleKind.System;
-        break;
-      case 'umd':
-        options.module = ts.ModuleKind.UMD;
-        break;
-    }
+    options.module = mapModule(options.module);
   }
 
   // if jsx is specified then treat file as .tsx
