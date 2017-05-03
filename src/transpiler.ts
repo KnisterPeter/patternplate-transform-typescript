@@ -106,7 +106,9 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
   const program = ts.createProgram([inputFileName], options, compilerHost);
 
   const result = program.emit();
-  const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(result.diagnostics);
+  const allDiagnostics =
+    ts.getPreEmitDiagnostics(program)
+    .concat(result.diagnostics, program.getDeclarationDiagnostics());
   allDiagnostics.forEach(diagnostic => {
     const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
     if (diagnostic.file) {
