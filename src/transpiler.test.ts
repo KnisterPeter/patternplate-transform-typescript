@@ -3,14 +3,9 @@ import * as ts from 'typescript';
 
 import { transpileModule } from './transpiler';
 
-test('Error during declaration building should log warnings/errors', t => {
+test('Error during declaration building should fail fast', t => {
   const origError = console.error;
   try {
-    const lines: string[] = [];
-    console.error = function(message: string): void {
-      lines.push(message);
-    };
-
     const input = `
       type RGB = [number, number, number];
 
@@ -25,10 +20,8 @@ test('Error during declaration building should log warnings/errors', t => {
     const manifest = {};
     const root = '/tmp';
 
-    transpileModule(input, options, manifest, root);
-
-    t.deepEqual(lines, [
-      `module.tsx (6,14): Exported type alias \'ColorOptions\' has or is using private name \'RGB\'.`]);
+    t.throws(() => transpileModule(input, options, manifest, root),
+      `module.tsx (6,14): Exported type alias \'ColorOptions\' has or is using private name \'RGB\'.`);
   } finally {
     console.error = origError;
   }
