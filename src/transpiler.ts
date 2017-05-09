@@ -120,9 +120,9 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
     const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
     if (diagnostic.file) {
       const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-      console.error(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
+      throw new Error(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
     } else {
-      console.error(`${message}`);
+      throw new Error(message);
     }
   });
   const exitCode = result.emitSkipped ? 1 : 0;
