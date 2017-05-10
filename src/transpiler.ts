@@ -131,6 +131,7 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
     ts.getPreEmitDiagnostics(program)
     .concat(
       result.diagnostics,
+      getDeclarationDiagnostics(program),
       program.getGlobalDiagnostics(),
       program.getOptionsDiagnostics(),
       program.getSemanticDiagnostics(),
@@ -160,4 +161,12 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
     diagnostics: allDiagnostics,
     sourceMapText
   };
+}
+
+function getDeclarationDiagnostics(program: ts.Program): ts.Diagnostic[] {
+  try {
+    return program.getDeclarationDiagnostics();
+  } catch (e) {
+    return [];
+  }
 }

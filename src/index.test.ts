@@ -89,7 +89,7 @@ test('createTypescriptTransform should write declarations if requested and possi
   configuration.opts.declaration = true;
 
   await transpile(application, `
-        function double(n: number) { return n * 2; }
+        function double3(n: number) { return n * 2; }
     `, configuration);
 
   t.is(application.resources.length, 1);
