@@ -114,7 +114,7 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
         // try to use standard resolution
         const result = ts.resolveModuleName(moduleName, containingFile, options,
           { fileExists: ts.sys.fileExists, readFile: ts.sys.readFile });
-        if (result.resolvedModule) {
+        if (result && result.resolvedModule) {
           return result.resolvedModule;
         }
 
