@@ -1,3 +1,4 @@
+import * as md5 from 'md5';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { mapJsx, mapTarget, mapModule } from './options';
@@ -19,9 +20,29 @@ export interface TranspileOutput {
   sourceMapText?: string;
 }
 
+interface CacheEntry {
+  status: number;
+  outputText: string;
+  declarationText: string;
+  sourceMapText: string;
+}
+const cache: {[hash: string]: CacheEntry} = {};
+
 // tslint:disable cyclomatic-complexity
 export function transpileModule(input: string, transpileOptions: TranspileOptions,
     patternManifest: PatternManifest, patternRoot: string): TranspileOutput {
+  const hash = md5(input);
+  if (hash in cache) {
+    const { status, outputText, declarationText, sourceMapText } = cache[hash];
+    return {
+      status,
+      outputText,
+      declarationText,
+      diagnostics: undefined,
+      sourceMapText
+    };
+  }
+
   const options: ts.CompilerOptions = transpileOptions.compilerOptions || ts.getDefaultCompilerOptions();
 
   if (options.jsx) {
@@ -110,7 +131,6 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
     ts.getPreEmitDiagnostics(program)
     .concat(
       result.diagnostics,
-      program.getDeclarationDiagnostics(),
       program.getGlobalDiagnostics(),
       program.getOptionsDiagnostics(),
       program.getSemanticDiagnostics(),
@@ -127,6 +147,12 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
   });
   const exitCode = result.emitSkipped ? 1 : 0;
 
+  cache[hash] = {
+    status: exitCode,
+    outputText,
+    declarationText,
+    sourceMapText
+  };
   return {
     status: exitCode,
     outputText,

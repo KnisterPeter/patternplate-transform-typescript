@@ -29,6 +29,7 @@
   "devDependencies": {
     "@knisterpeter/standard-tslint": "^1.4.0",
     "@types/common-tags": "^1.2.5",
+    "@types/md5": "^2.1.32",
     "@types/node": "^7.0.12",
     "ava": "^0.19.0",
     "common-tags": "^1.4.0",
@@ -68,5 +69,8 @@
       "dist/**/*.test.js",
       "wallaby.conf.js"
     ]
+  },
+  "dependencies": {
+    "md5": "^2.2.1"
   }
 }
