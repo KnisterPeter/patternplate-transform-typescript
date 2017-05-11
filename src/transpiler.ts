@@ -30,7 +30,7 @@ const cache: {[hash: string]: CacheEntry} = {};
 
 // tslint:disable cyclomatic-complexity
 export function transpileModule(input: string, transpileOptions: TranspileOptions,
-    map: {[path: string]: PatterplateFile}, patternRoot: string): TranspileOutput {
+    map: {[path: string]: PatterplateFile | null}, patternRoot: string): TranspileOutput {
   const hash = md5(input);
   if (hash in cache) {
     const { status, outputText, declarationText, sourceMapText } = cache[hash];
@@ -106,9 +106,14 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
           return { resolvedFileName: containingFile.replace('demo.tsx', 'index.tsx') };
         }
 
-        const patternManifest = map[containingFile].pattern.manifest;
-        if (patternManifest.patterns && moduleName in patternManifest.patterns) {
-          const resolvedFileName = path.join(patternRoot, patternManifest.patterns[moduleName], 'index.tsx');
+        const patternFile = map[containingFile];
+        const patternManifest = patternFile ? patternFile.pattern.manifest : {};
+        const patterns = patternManifest.patterns ? patternManifest.patterns : {};
+        const pattern = patterns[moduleName];
+
+        // try to resolve pattern.json defined pattern dependency
+        if (pattern) {
+          const resolvedFileName = path.join(patternRoot, pattern, 'index.tsx');
           return { resolvedFileName };
         }
 
