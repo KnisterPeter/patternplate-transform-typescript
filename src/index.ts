@@ -20,7 +20,8 @@ function writeDeclaration(input: PatterplateFile, output: TranspileOutput, appli
   }
 }
 
-function transpile(input: PatterplateFile, compilerOptions: ts.CompilerOptions, application: Application): void {
+function transpile(input: PatterplateFile, compilerOptions: ts.CompilerOptions, application: Application,
+    map: {[path: string]: PatterplateFile}): void {
   const transpileOptions: ts.TranspileOptions = {
     compilerOptions,
     fileName: input.path,
@@ -28,28 +29,40 @@ function transpile(input: PatterplateFile, compilerOptions: ts.CompilerOptions, 
     moduleName: input.basename
   };
   const content = typeof input.buffer === 'string' ? input.buffer : input.buffer.toString('utf-8');
-  const output = transpileModule(content, transpileOptions, input.pattern.manifest, input.pattern.base);
+  const output = transpileModule(content, transpileOptions, map, input.pattern.base);
   input.buffer = new Buffer(output.outputText);
   writeDeclaration(input, output, application);
 }
 
 function transpileFile(file: PatterplateFile, compilerOptions: ts.CompilerOptions,
-  application: Application): void {
+  application: Application, map: {[path: string]: PatterplateFile}): void {
   Object.keys(file.dependencies).forEach(localName => {
     const dependency = file.dependencies[localName];
     if (file.pattern.id !== dependency.pattern.id || file.path !== dependency.path) {
-      transpileFile(dependency, compilerOptions, application);
+      transpileFile(dependency, compilerOptions, application, map);
     }
   });
-  transpile(file, compilerOptions, application);
+  transpile(file, compilerOptions, application, map);
+}
+
+function buildPattternMap(file: PatterplateFile, map: {[path: string]: PatterplateFile}): void {
+  map[file.path] = file;
+  if (file.dependencies) {
+    Object
+      .keys(file.dependencies)
+      .forEach(localName => buildPattternMap(file.dependencies[localName], map));
+  }
 }
 
 function typescriptTransformFactory(application: Application): TypeScriptTransform {
   return async function typescriptTransform(file: PatterplateFile, _, configuration: PatternplateConfiguration):
     Promise<PatterplateFile> {
 
+    const map: {[path: string]: PatterplateFile} = {};
+    buildPattternMap(file, map);
+
     const compilerOptions = configuration.opts || ts.getDefaultCompilerOptions();
-    transpileFile(file, compilerOptions, application);
+    transpileFile(file, compilerOptions, application, map);
     return file;
   };
 }

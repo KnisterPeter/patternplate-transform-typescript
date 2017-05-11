@@ -2,7 +2,7 @@ import * as md5 from 'md5';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { mapJsx, mapTarget, mapModule } from './options';
-import { PatternManifest } from './types';
+import { PatterplateFile } from './types';
 
 export interface TranspileOptions {
   compilerOptions?: ts.CompilerOptions;
@@ -30,7 +30,7 @@ const cache: {[hash: string]: CacheEntry} = {};
 
 // tslint:disable cyclomatic-complexity
 export function transpileModule(input: string, transpileOptions: TranspileOptions,
-    patternManifest: PatternManifest, patternRoot: string): TranspileOutput {
+    map: {[path: string]: PatterplateFile}, patternRoot: string): TranspileOutput {
   const hash = md5(input);
   if (hash in cache) {
     const { status, outputText, declarationText, sourceMapText } = cache[hash];
@@ -106,6 +106,7 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
           return { resolvedFileName: containingFile.replace('demo.tsx', 'index.tsx') };
         }
 
+        const patternManifest = map[containingFile].pattern.manifest;
         if (patternManifest.patterns && moduleName in patternManifest.patterns) {
           const resolvedFileName = path.join(patternRoot, patternManifest.patterns[moduleName], 'index.tsx');
           return { resolvedFileName };
