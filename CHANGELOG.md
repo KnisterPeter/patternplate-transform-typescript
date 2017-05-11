@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.6.3"></a>
+## [0.6.3](https://github.com/KnisterPeter/patternplate-transform-typescript/compare/v0.6.2...v0.6.3) (2017-05-11)
+
+
+### Bug Fixes
+
+* write only required files; skip transitives ([f2d89fb](https://github.com/KnisterPeter/patternplate-transform-typescript/commit/f2d89fb))
+
+
+
 <a name="0.6.2"></a>
 ## [0.6.2](https://github.com/KnisterPeter/patternplate-transform-typescript/compare/v0.6.1...v0.6.2) (2017-05-11)
 
