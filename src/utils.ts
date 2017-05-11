@@ -6,5 +6,7 @@ export function addOutputArtifact(application: Application, artifact: OutputArti
       ...application.resources.filter(r => r.id !== artifact.id),
       artifact
     ];
+  } else {
+    console.warn(`Tried to write additional artifacts but your patternplate version is outdated. Try to update`);
   }
 }
