@@ -82,6 +82,12 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
       }
     },
     writeFile: (name, text) => {
+      // console.log('skip?', inputFileName.replace(/.tsx?/, ''), name.replace(/\.jsx?|\.d.ts|\.map/, ''));
+      if (inputFileName.replace(/\.tsx?/, '') !== name.replace(/\.jsx?|\.d\.ts|\.map/, '')) {
+        // console.warn('Skipping transitive dependency results', name, 'for', inputFileName);
+        return;
+      }
+      // console.log('writing', name, 'for', inputFileName);
       if (name.endsWith('.map')) {
         sourceMapText = text;
       } else if (name.endsWith('.d.ts')) {
