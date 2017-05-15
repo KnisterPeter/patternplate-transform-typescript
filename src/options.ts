@@ -42,9 +42,9 @@ export function mapModule(input: string | ts.ModuleKind): ts.ModuleKind {
   return input;
 }
 
-function getKeys(input: object): { [name: string]: number } {
+function getKeys(input: any): { [name: string]: number } {
   return Object
     .keys(input)
     .filter(key => isNaN(parseInt(key, 10)))
-    .reduce((obj, key) => (obj[key.toLowerCase()] = input[key], obj), {});
+    .reduce((obj, key) => (obj[key.toLowerCase()] = input[key], obj), {} as { [name: string]: number });
 }

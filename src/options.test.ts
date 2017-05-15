@@ -8,15 +8,15 @@ Object.keys(ts.JsxEmit).forEach(jsxOption => {
   if (isNaN(num)) {
     test(`map JsxEmit ${jsxOption}`, t => {
       const result = mapJsx(jsxOption);
-      t.is(result, ts.JsxEmit[jsxOption]);
+      t.is(result, (ts.JsxEmit as any)[jsxOption]);
     });
     test(`map JsxEmit lowercase ${jsxOption}`, t => {
       const result = mapJsx(jsxOption.toLowerCase());
-      t.is(result, ts.JsxEmit[jsxOption]);
+      t.is(result, (ts.JsxEmit as any)[jsxOption]);
     });
   } else {
     test(`map JsxEmit ${num}`, t => {
-      const expected: ts.JsxEmit = ts.JsxEmit[ts.JsxEmit[jsxOption]] as any;
+      const expected: ts.JsxEmit = ts.JsxEmit[(ts.JsxEmit as any)[jsxOption]] as any;
       const result = mapJsx(num);
       t.is(result, expected);
     });
@@ -36,15 +36,15 @@ Object.keys(ts.ScriptTarget).forEach(targetOption => {
   if (isNaN(num)) {
     test(`map mapTarget ${targetOption}`, t => {
       const result = mapTarget(targetOption);
-      t.is(result, ts.ScriptTarget[targetOption]);
+      t.is(result, (ts.ScriptTarget as any)[targetOption]);
     });
     test(`map mapTarget lowercase ${targetOption}`, t => {
       const result = mapTarget(targetOption.toLowerCase());
-      t.is(result, ts.ScriptTarget[targetOption]);
+      t.is(result, (ts.ScriptTarget as any)[targetOption]);
     });
   } else {
     test(`map ScriptTarget ${num}`, t => {
-      const expected: ts.ScriptTarget = ts.ScriptTarget[ts.ScriptTarget[targetOption]] as any;
+      const expected: ts.ScriptTarget = ts.ScriptTarget[(ts.ScriptTarget as any)[targetOption]] as any;
       const result = mapTarget(num);
       t.is(result, expected);
     });
@@ -64,15 +64,15 @@ Object.keys(ts.ModuleKind).forEach(moduleOption => {
   if (isNaN(num)) {
     test(`map mapTarget ${moduleOption}`, t => {
       const result = mapModule(moduleOption);
-      t.is(result, ts.ModuleKind[moduleOption]);
+      t.is(result, (ts.ModuleKind as any)[moduleOption]);
     });
     test(`map mapTarget lowercase ${moduleOption}`, t => {
       const result = mapModule(moduleOption.toLowerCase());
-      t.is(result, ts.ModuleKind[moduleOption]);
+      t.is(result, (ts.ModuleKind as any)[moduleOption]);
     });
   } else {
     test(`map ModuleKind ${num}`, t => {
-      const expected: ts.ModuleKind = ts.ModuleKind[ts.ModuleKind[moduleOption]] as any;
+      const expected: ts.ModuleKind = ts.ModuleKind[(ts.ModuleKind as any)[moduleOption]] as any;
       const result = mapModule(num);
       t.is(result, expected);
     });
