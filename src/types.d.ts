@@ -1,5 +1,9 @@
 import * as ts from 'typescript';
 
+export interface DependencyMap {
+  [path: string]: PatterplateFile;
+}
+
 export interface PatterplateFile {
   buffer: Buffer | string;
   name: string;
@@ -22,7 +26,7 @@ export interface PatterplateFile {
 
 export interface PatternManifest {
   patterns?: {
-    [local: string]: string;
+    [local: string]: string | undefined;
   };
 }
 

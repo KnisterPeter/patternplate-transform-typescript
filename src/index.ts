@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import { transpileModule, TranspileOutput } from './transpiler';
-import { Application, PatternplateConfiguration, PatterplateFile, TypeScriptTransform } from './types';
+import { Application, PatternplateConfiguration, PatterplateFile, TypeScriptTransform, DependencyMap } from './types';
 import * as utils from './utils';
 
 module.exports = function createTypescriptTransform(application: Application): TypeScriptTransform {
@@ -21,7 +21,7 @@ function writeDeclaration(input: PatterplateFile, output: TranspileOutput, appli
 }
 
 function transpile(input: PatterplateFile, compilerOptions: ts.CompilerOptions, application: Application,
-    map: {[path: string]: PatterplateFile | null}): void {
+    map: DependencyMap): void {
   const transpileOptions: ts.TranspileOptions = {
     compilerOptions,
     fileName: input.path,
@@ -35,7 +35,7 @@ function transpile(input: PatterplateFile, compilerOptions: ts.CompilerOptions, 
 }
 
 function transpileFile(file: PatterplateFile, compilerOptions: ts.CompilerOptions,
-  application: Application, map: {[path: string]: PatterplateFile | null}): void {
+  application: Application, map: DependencyMap): void {
   Object.keys(file.dependencies).forEach(localName => {
     const dependency = file.dependencies[localName];
     if (file.pattern.id !== dependency.pattern.id || file.path !== dependency.path) {
@@ -45,7 +45,7 @@ function transpileFile(file: PatterplateFile, compilerOptions: ts.CompilerOption
   transpile(file, compilerOptions, application, map);
 }
 
-function buildPattternMap(file: PatterplateFile, map: {[path: string]: PatterplateFile | null}): void {
+function buildPattternMap(file: PatterplateFile, map: DependencyMap): void {
   map[file.path] = file;
   if (file.dependencies) {
     Object
@@ -58,7 +58,7 @@ function typescriptTransformFactory(application: Application): TypeScriptTransfo
   return async function typescriptTransform(file: PatterplateFile, _, configuration: PatternplateConfiguration):
     Promise<PatterplateFile> {
 
-    const map: {[path: string]: PatterplateFile | null} = {};
+    const map: DependencyMap = {};
     buildPattternMap(file, map);
 
     const compilerOptions = configuration.opts || ts.getDefaultCompilerOptions();

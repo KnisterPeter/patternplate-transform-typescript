@@ -1,7 +1,7 @@
 import test from 'ava';
 import * as ts from 'typescript';
 
-import { transpileModule } from './transpiler';
+import { transpileModule, resolveDependency } from './transpiler';
 
 test('Error during declaration building should fail fast', t => {
   const origError = console.error;
@@ -25,4 +25,37 @@ test('Error during declaration building should fail fast', t => {
   } finally {
     console.error = origError;
   }
+});
+
+test('resolveDependency should not resolve relative paths', t => {
+  const resolved = resolveDependency('./moduleName',
+    'containingFile', {}, 'patternRoot', ts.getDefaultCompilerOptions());
+  t.falsy(resolved);
+});
+
+test('resolveDependency should resolve Pattern if in demo.tsx', t => {
+  const resolved = resolveDependency('Pattern',
+    './demo.tsx', {}, '/patternRoot/', ts.getDefaultCompilerOptions());
+  t.deepEqual(resolved, {
+    resolvedFileName: './index.tsx'
+  });
+});
+
+test('resolveDependency should resolve patterns from pattern.json', t => {
+  const map = {
+    '/patternRoot/pattern/index.tsx': {
+      pattern: {
+        manifest: {
+          patterns: {
+            dependency: 'dependency'
+          }
+        }
+      }
+    } as any
+  };
+  const resolved = resolveDependency('dependency',
+    '/patternRoot/pattern/index.tsx', map, '/patternRoot/', ts.getDefaultCompilerOptions());
+  t.deepEqual(resolved, {
+    resolvedFileName: '/patternRoot/dependency/index.tsx'
+  });
 });

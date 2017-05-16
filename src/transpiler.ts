@@ -2,7 +2,7 @@ import * as md5 from 'md5';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { mapJsx, mapTarget, mapModule } from './options';
-import { PatterplateFile } from './types';
+import { DependencyMap } from './types';
 
 export interface TranspileOptions {
   compilerOptions?: ts.CompilerOptions;
@@ -30,7 +30,7 @@ const cache: {[hash: string]: CacheEntry} = {};
 
 // tslint:disable cyclomatic-complexity
 export function transpileModule(input: string, transpileOptions: TranspileOptions,
-    map: {[path: string]: PatterplateFile | null}, patternRoot: string): TranspileOutput {
+    map: DependencyMap, patternRoot: string): TranspileOutput {
   const hash = md5(input);
   if (hash in cache) {
     const { status, outputText, declarationText, sourceMapText } = cache[hash];
@@ -106,33 +106,8 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
     directoryExists: path => ts.sys.directoryExists(path),
     getDirectories: () => [],
     resolveModuleNames(moduleNames: string[], containingFile: string): (ts.ResolvedModule)[] {
-      return moduleNames.map(moduleName => {
-        // try patternplate demo Pattern dependency
-        if (moduleName === 'Pattern' && containingFile.endsWith('demo.tsx')) {
-          return { resolvedFileName: containingFile.replace('demo.tsx', 'index.tsx') };
-        }
-
-        const patternFile = map[containingFile];
-        const patternManifest = patternFile ? patternFile.pattern.manifest : {};
-        const patterns = patternManifest.patterns ? patternManifest.patterns : {};
-        const pattern = patterns[moduleName];
-
-        // try to resolve pattern.json defined pattern dependency
-        if (pattern) {
-          const resolvedFileName = path.join(patternRoot, pattern, 'index.tsx');
-          return { resolvedFileName };
-        }
-
-        // try to use standard resolution
-        const result = ts.resolveModuleName(moduleName, containingFile, options,
-          { fileExists: ts.sys.fileExists, readFile: ts.sys.readFile });
-        if (result && result.resolvedModule) {
-          return result.resolvedModule;
-        }
-
-        // note: as any is a quirk here, since the CompilerHost interface does not allow strict null checks
-        return undefined as any;
-      });
+      return moduleNames.map(moduleName =>
+        resolveDependency(moduleName, containingFile, map, patternRoot, options) as any);
     }
   };
 
@@ -181,4 +156,34 @@ function getDeclarationDiagnostics(program: ts.Program): ts.Diagnostic[] {
   } catch (e) {
     return [];
   }
+}
+
+export function resolveDependency(moduleName: string, containingFile: string, map: DependencyMap,
+    patternRoot: string, options: ts.CompilerOptions): ts.ResolvedModule | undefined {
+  // try patternplate demo Pattern dependency
+  if (moduleName === 'Pattern' && containingFile.endsWith('demo.tsx')) {
+    return { resolvedFileName: containingFile.replace('demo.tsx', 'index.tsx') };
+  }
+
+  if (containingFile in map) {
+    const patterns = map[containingFile].pattern.manifest.patterns || {};
+    const pattern = patterns[moduleName];
+
+    // try to resolve pattern.json defined pattern dependency
+    if (pattern) {
+      const resolvedFileName = path.join(patternRoot, pattern, 'index.tsx');
+      return { resolvedFileName };
+    }
+  }
+
+  if (!moduleName.startsWith('.')) {
+    // try to use standard resolution
+    const result = ts.resolveModuleName(moduleName, containingFile, options,
+      { fileExists: ts.sys.fileExists, readFile: ts.sys.readFile });
+    if (result && result.resolvedModule) {
+      return result.resolvedModule;
+    }
+  }
+
+  return undefined;
 }
