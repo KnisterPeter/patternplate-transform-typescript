@@ -22,6 +22,10 @@ function writeDeclaration(input: PatterplateFile, output: TranspileOutput, appli
 
 function transpile(input: PatterplateFile, compilerOptions: ts.CompilerOptions, application: Application,
     map: DependencyMap): void {
+  // xxx: hack to do not transpile twice
+  if ((input as any).typescriptTranspiled) {
+    return;
+  }
   const transpileOptions: ts.TranspileOptions = {
     compilerOptions,
     fileName: input.path,
@@ -31,6 +35,7 @@ function transpile(input: PatterplateFile, compilerOptions: ts.CompilerOptions, 
   const content = typeof input.buffer === 'string' ? input.buffer : input.buffer.toString('utf-8');
   const output = transpileModule(content, transpileOptions, map, input.pattern.base);
   input.buffer = new Buffer(output.outputText);
+  (input as any).typescriptTranspiled = true;
   writeDeclaration(input, output, application);
 }
 
