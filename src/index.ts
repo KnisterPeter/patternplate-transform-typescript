@@ -1,3 +1,4 @@
+import { dirname, join, resolve, relative } from 'path';
 import * as ts from 'typescript';
 import { transpileModule, TranspileOutput } from './transpiler';
 import { Application, PatternplateConfiguration, PatterplateFile, TypeScriptTransform, DependencyMap } from './types';
@@ -9,16 +10,41 @@ module.exports = function createTypescriptTransform(application: Application): T
 
 function writeDeclaration(input: PatterplateFile, output: TranspileOutput, application: Application): void {
   if (output.declarationText) {
+    const content = Object
+      .keys(input.pattern.manifest.patterns || {})
+      .reduce((source, local) => {
+        const from = dirname(input.path);
+        const remote = ((input.pattern.manifest.patterns || {}) as any)[local];
+        const to = join(relative(from, resolve(from, join('..', remote))), 'index');
+        let result = source;
+        while (true) {
+          result = source
+            // es2015 import
+            .replace(new RegExp(`(import.*?from\\s+['"])${local}(['"]\\s*;)`), `$1${to}$2`)
+            // import-require
+            .replace(new RegExp(`(import.*?=\\s+require\\s*\\(\\s*['"])${local}(['"]\\s*\\)\\s*;)`),
+              `$1${to}$2`)
+            // commonjs require
+            .replace(new RegExp(`((?:var|const|let).*?=\\s+require\\s*\\(\\s*['"])${local}(['"]\\s*\\)\\s*;)`),
+              `$1${to}$2`);
+          if (result === source) {
+            return result;
+          }
+          source = result;
+        }
+      }, output.declarationText);
+
     utils.addOutputArtifact(application, {
       id: `typescript-definition/${input.pattern.id}`,
       pattern: input.pattern.id,
       type: 'd.ts',
       reference: true,
-      content: output.declarationText,
+      content,
       file: input
     });
   }
 }
+module.exports.writeDeclaration = writeDeclaration;
 
 function transpile(input: PatterplateFile, compilerOptions: ts.CompilerOptions, application: Application,
     map: DependencyMap): void {
