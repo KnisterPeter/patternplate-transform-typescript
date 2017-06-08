@@ -94,3 +94,38 @@ test('createTypescriptTransform should write declarations if requested and possi
 
   t.is(application.resources.length, 1);
 });
+
+test('writeDeclaration should rewrite dependency paths on a best guess', t => {
+  const expected = stripIndents`
+    import Type1 from '../dependency-folder/index';
+    import { Type1a } from '../dependency-folder/index';
+    import * as Type1b from '../dependency-folder/index';
+    import Type2 = require('../dependency-folder/index');
+    const Type3 = require('../dependency-folder/index');
+  `;
+
+  const input = getFileMock(``);
+  input.path = '/tmp/patterns/input/index.tsx';
+  input.pattern.manifest.patterns = {
+    dependency: 'dependency-folder'
+  };
+  input.dependencies['dependency'] = getFileMock('', 'dependency-folder');
+  input.dependencies['dependency'].path = '/tmp/patterns/dependency-folder/index.tsx';
+  const application = getApplicationMock();
+  application.resources = [];
+  const output = {
+    status: 0,
+    outputText: '',
+    declarationText: stripIndents`
+      import Type1 from 'dependency';
+      import { Type1a } from 'dependency';
+      import * as Type1b from 'dependency';
+      import Type2 = require('dependency');
+      const Type3 = require('dependency');
+    `
+  };
+
+  (createTypescriptTransform as any).writeDeclaration(input, output, application);
+
+  t.deepEqual(application.resources[0].content, expected);
+});
