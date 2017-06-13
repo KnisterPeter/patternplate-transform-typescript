@@ -176,7 +176,7 @@ export function resolveDependency(moduleName: string, containingFile: string, ma
     }
   }
 
-  if (!moduleName.startsWith('.')) {
+  if (!moduleName.startsWith('.') || containingFile.indexOf('node_modules') > -1) {
     // try to use standard resolution
     const result = ts.resolveModuleName(moduleName, containingFile, options,
       { fileExists: ts.sys.fileExists, readFile: ts.sys.readFile });
