@@ -16,7 +16,7 @@ function writeDeclaration(input: PatterplateFile, output: TranspileOutput, appli
     patterns.forEach(pattern => {
       const remote = ((input.pattern.manifest.patterns || {}) as any)[pattern];
       const remoteDepth = remote.split(sep);
-      if (minDepth === -1 || remoteDepth.length < minDepth) {
+      if (minDepth === -1 || remoteDepth.length < minDepth) {
         minDepth = remoteDepth.length;
       }
     });
