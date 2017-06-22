@@ -46,5 +46,5 @@ function getKeys(input: any): { [name: string]: number } {
   return Object
     .keys(input)
     .filter(key => isNaN(parseInt(key, 10)))
-    .reduce((obj, key) => (obj[key.toLowerCase()] = input[key], obj), {} as { [name: string]: number });
+    .reduce((obj: { [name: string]: number }, key) => (obj[key.toLowerCase()] = input[key], obj), {});
 }
