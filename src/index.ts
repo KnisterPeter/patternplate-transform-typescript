@@ -1,4 +1,4 @@
-import { dirname, join, resolve, relative } from 'path';
+import { dirname, join, resolve, relative, sep } from 'path';
 import * as ts from 'typescript';
 import { transpileModule, TranspileOutput } from './transpiler';
 import { Application, PatternplateConfiguration, PatterplateFile, TypeScriptTransform, DependencyMap } from './types';
@@ -10,12 +10,23 @@ module.exports = function createTypescriptTransform(application: Application): T
 
 function writeDeclaration(input: PatterplateFile, output: TranspileOutput, application: Application): void {
   if (output.declarationText) {
-    const content = Object
-      .keys(input.pattern.manifest.patterns || {})
+    const patterns = Object
+      .keys(input.pattern.manifest.patterns || {});
+    let minDepth: number = -1;
+    patterns.forEach(pattern => {
+      const remote = ((input.pattern.manifest.patterns || {}) as any)[pattern];
+      const remoteDepth = remote.split(sep);
+      if (minDepth === -1 || remoteDepth.length < minDepth) {
+        minDepth = remoteDepth.length;
+      }
+    });
+    const content = patterns
       .reduce((source, local) => {
         const from = dirname(input.path);
         const remote = ((input.pattern.manifest.patterns || {}) as any)[local];
-        const to = join(relative(from, resolve(from, join('..', remote))), 'index');
+        const remoteDepth = remote ? Math.min(remote.split(sep).length, minDepth) : 1;
+        const relativeRemotePath = new Array(remoteDepth).fill('..').join('/');
+        const to = join(relative(from, resolve(from, join(relativeRemotePath, remote))), 'index');
         let result = source;
         while (true) {
           result = source
