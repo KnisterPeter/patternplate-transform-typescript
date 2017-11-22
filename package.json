@@ -27,7 +27,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@knisterpeter/standard-tslint": "^1.4.0",
+    "@knisterpeter/standard-tslint": "^1.6.0",
     "@types/common-tags": "^1.2.5",
     "@types/md5": "^2.1.32",
     "@types/node": "^7.0.12",
@@ -39,8 +39,8 @@
     "rimraf": "^2.6.1",
     "source-map-support": "^0.4.14",
     "standard-version": "^4.0.0",
-    "tslint": "^5.0.0",
-    "typescript": "^2.3.2"
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.1"
   },
   "peerDependencies": {
     "typescript": ">=2.2.2"
