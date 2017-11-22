@@ -16,7 +16,7 @@ test('Error during declaration building should fail fast', t => {
 
       export default ColorOptions;
     `;
-    const options = ts.getDefaultCompilerOptions();
+    const options: any = ts.getDefaultCompilerOptions();
     const manifest = {};
     const root = '/tmp';
 

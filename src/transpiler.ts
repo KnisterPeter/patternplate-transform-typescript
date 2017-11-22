@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import { mapJsx, mapTarget, mapModule } from './options';
 import { DependencyMap } from './types';
+import * as utils from './utils';
 
 export interface TranspileOptions {
   compilerOptions?: ts.CompilerOptions;
@@ -57,7 +58,7 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
   }
 
   // if jsx is specified then treat file as .tsx
-  const inputFileName = transpileOptions.fileName || (options.jsx ? 'module.tsx' : 'module.ts');
+  const inputFileName = utils.normalizePath(transpileOptions.fileName || (options.jsx ? 'module.tsx' : 'module.ts'));
   const sourceFile = ts.createSourceFile(inputFileName, input, options.target || ts.ScriptTarget.ES5);
   if (transpileOptions.moduleName) {
     sourceFile.moduleName = transpileOptions.moduleName;
@@ -75,7 +76,7 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
         return sourceFile;
       }
       try {
-        return ts.createSourceFile(fileName, ts.sys.readFile(fileName), options.target || ts.ScriptTarget.ES5);
+        return ts.createSourceFile(fileName, ts.sys.readFile(fileName) || '', options.target || ts.ScriptTarget.ES5);
       } catch (e) {
         console.error('failed to read source-file', fileName);
         return undefined!;
@@ -126,7 +127,7 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
     );
   allDiagnostics.forEach(diagnostic => {
     const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-    if (diagnostic.file) {
+    if (diagnostic.file && typeof diagnostic.start === 'number') {
       const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
       throw new Error(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
     } else {
@@ -150,7 +151,7 @@ export function transpileModule(input: string, transpileOptions: TranspileOption
   };
 }
 
-function getDeclarationDiagnostics(program: ts.Program): ts.Diagnostic[] {
+function getDeclarationDiagnostics(program: ts.Program): ReadonlyArray<ts.Diagnostic> {
   try {
     return program.getDeclarationDiagnostics();
   } catch (e) {
