@@ -12,7 +12,7 @@ function writeDeclaration(input: PatterplateFile, output: TranspileOutput, appli
   if (output.declarationText) {
     const patterns = Object
       .keys(input.pattern.manifest.patterns || {});
-    let minDepth: number = -1;
+    let minDepth = -1;
     patterns.forEach(pattern => {
       const remote = ((input.pattern.manifest.patterns || {}) as any)[pattern];
       const remoteDepth = remote.split(sep);
@@ -88,7 +88,7 @@ function transpileFile(file: PatterplateFile, compilerOptions: ts.CompilerOption
 }
 
 function buildPattternMap(file: PatterplateFile, map: DependencyMap): void {
-  map[file.path] = file;
+  map[utils.normalizePath(file.path)] = file;
   if (file.dependencies) {
     Object
       .keys(file.dependencies)
