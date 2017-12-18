@@ -26,7 +26,7 @@ function writeDeclaration(input: PatterplateFile, output: TranspileOutput, appli
         const remote = ((input.pattern.manifest.patterns || {}) as any)[local];
         const remoteDepth = remote ? Math.min(remote.split(sep).length, minDepth) : 1;
         const relativeRemotePath = new Array(remoteDepth).fill('..').join('/');
-        const to = join(relative(from, resolve(from, join(relativeRemotePath, remote))), 'index');
+        const to = join(relative(from, resolve(from, join(relativeRemotePath, remote))), 'index').replace(/\\/g, '/');
         let result = source;
         while (true) {
           result = source
