@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.7.4"></a>
+## [0.7.4](https://github.com/KnisterPeter/patternplate-transform-typescript/compare/v0.7.3...v0.7.4) (2017-12-18)
+
+
+### Bug Fixes
+
+* convert declaration file imports backslashes to slashes on win32 platform ([7644861](https://github.com/KnisterPeter/patternplate-transform-typescript/commit/7644861))
+
+
+
 <a name="0.7.3"></a>
 ## [0.7.3](https://github.com/KnisterPeter/patternplate-transform-typescript/compare/v0.7.2...v0.7.3) (2017-11-22)
 
